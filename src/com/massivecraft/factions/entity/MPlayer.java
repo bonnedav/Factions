@@ -17,6 +17,8 @@ import com.massivecraft.massivecore.mixin.MixinSenderPs;
 import com.massivecraft.massivecore.mixin.MixinTitle;
 import com.massivecraft.massivecore.ps.PS;
 import com.massivecraft.massivecore.ps.PSFormatHumanSpace;
+import com.massivecraft.massivecore.store.Coll;
+import com.massivecraft.massivecore.store.Modification;
 import com.massivecraft.massivecore.store.SenderEntity;
 import com.massivecraft.massivecore.util.IdUtil;
 import com.massivecraft.massivecore.util.MUtil;
@@ -30,6 +32,7 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -215,6 +218,20 @@ public class MPlayer extends SenderEntity<MPlayer> implements FactionsParticipat
 	// FIELD: lastActivityMillis
 	// -------------------------------------------- //
 
+	@Override
+	public void changed()
+	{
+		super.changed();
+		Coll<MPlayer> coll = this.getColl();
+		if (coll == null) return;
+		Map<String, Modification> identifiedModifications = coll.identifiedModifications;
+		if (identifiedModifications == null) return;
+		String id = this.getId();
+		
+		Modification mod = identifiedModifications.get(id);
+		System.out.println("changed(): " + mod);
+	}
+	
 	public long getLastActivityMillis()
 	{
 		return this.lastActivityMillis;
@@ -222,8 +239,9 @@ public class MPlayer extends SenderEntity<MPlayer> implements FactionsParticipat
 
 	public void setLastActivityMillis(long lastActivityMillis)
 	{
+		this.lastActivityMillis = convertSet(lastActivityMillis, this.lastActivityMillis, null);
 		// Clean input
-		long target = lastActivityMillis;
+		/*long target = lastActivityMillis;
 
 		// Detect Nochange
 		if (MUtil.equals(this.lastActivityMillis, target)) return;
@@ -232,7 +250,7 @@ public class MPlayer extends SenderEntity<MPlayer> implements FactionsParticipat
 		this.lastActivityMillis = target;
 
 		// Mark as changed
-		this.changed();
+		this.changed();*/
 	}
 
 	public void setLastActivityMillis()
